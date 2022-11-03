@@ -1,0 +1,22 @@
+version: 2.1
+
+orbs:
+  gradle: circleci/gradle@2.2.0
+
+executors:
+  my-executor:
+    docker:
+      - image: cimg/openjdk:17.0.4
+    resource_class: medium
+
+workflows:
+  checkout-and-build:
+    jobs:
+      - gradle/run:
+          executor: my-executor
+          filters:
+            branches:
+              only:
+                - main
+            requires:
+              - build
