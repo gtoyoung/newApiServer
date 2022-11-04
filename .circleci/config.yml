@@ -1,22 +1,33 @@
 version: 2.1
 
-orbs:
-  gradle: circleci/gradle@2.2.0
+jobs:
+  build:
+      docker:
+        - image: cimg/openjdk:17.0.4
+      steps:
+        - checkout
+        - run:
+            name: Deploy Over SSH
+            command: ./gradlew build
 
-executors:
-  my-executor:
-    docker:
-      - image: cimg/openjdk:17.0.4
-    resource_class: medium
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - run:
+          name: Deploy Over SSH
+          command: ssh ubuntu@152.67.212.253 "./deploy.sh"
 
 workflows:
-  checkout-and-build:
-    jobs:
-      - gradle/run:
-          executor: my-executor
-          filters:
-            branches:
-              only:
-                - main
-            requires:
-              - build
+  version: 2
+  build-and-deploy:
+  jobs:
+    - build
+    - deploy:
+        requires:
+          - build # only deploy once build job has completed
+        filters:
+        branches:
+          only: main # only deploy on the main branch
+
+
