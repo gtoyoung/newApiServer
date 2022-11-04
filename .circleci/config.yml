@@ -5,7 +5,6 @@ jobs:
       docker:
         - image: cimg/openjdk:17.0.4
       steps:
-        - checkout
         - run:
             name: Deploy Over SSH
             command: ./gradlew build
