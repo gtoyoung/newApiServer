@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,4 +26,8 @@ public class SportNews {
     private String link;
     @Column
     private LocalDateTime registDate;
+
+    // 테이블에 적용하지 않음
+    @Transient
+    private List<String> words;
 }

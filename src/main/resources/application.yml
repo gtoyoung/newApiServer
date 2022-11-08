@@ -8,7 +8,7 @@ spring:
 
     jpa:
         hibernate:
-            ddl-auto: none
+            ddl-auto:
         properties:
           hibernate:
               format_sql: true
@@ -34,3 +34,6 @@ swagger:
         /swagger-resources,
         /swagger-resources/**/*,
         /v2/api-docs
+
+jwt:
+    secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa

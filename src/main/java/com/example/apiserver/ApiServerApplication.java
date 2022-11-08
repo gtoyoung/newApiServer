@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 //        DataSourceTransactionManagerAutoConfiguration.class,
 //        HibernateJpaAutoConfiguration.class
 //})
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.example.apiserver"})
 public class ApiServerApplication {
 
     public static void main(String[] args) {
