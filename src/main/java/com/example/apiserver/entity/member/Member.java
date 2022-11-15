@@ -1,11 +1,13 @@
-package com.example.apiserver.entity;
+package com.example.apiserver.entity.member;
 
 
+import com.example.apiserver.dto.MemberFormDto;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,26 +21,47 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="TB_USERS")
-public class User implements UserDetails {
+@Table(name = "TB_USERS")
+public class Member implements UserDetails {
     @Id
-    @Column(updatable = false, unique = true, nullable = false, name="user_id")
+    @Column(updatable = false, unique = true, nullable = false, name = "user_id")
     private String userId;
 
     @Column(nullable = false, name = "user_pwd")
     private String userPwd;
 
-    @Column(nullable = false, name="nick")
+    @Column(nullable = false, name = "nick")
     private String nick;
 
-
-    @ElementCollection(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
+    @JsonManagedReference(value = "user")
     @Builder.Default
-    private List<String> roles = new ArrayList<>();
+    private List<MemberRoleMapping> roles = new ArrayList<>();
+
+    @Builder
+    public Member(String userId, String userPwd, String nick) {
+        this.userId = userId;
+        this.userPwd = userPwd;
+        this.nick = nick;
+    }
+
+    public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder) {
+        Member member = Member.builder().userId(memberFormDto.getUserId())
+                .userPwd(passwordEncoder.encode(memberFormDto.getPassword()))
+                .nick(memberFormDto.getNick())
+                .build();
+        return member;
+    }
+
+    public void addRole(MemberRoleMapping roleMapping) {
+        this.roles.add(roleMapping);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
+                .map(MemberRoleMapping::getMemberRole)
+                .map(MemberRole::getName)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

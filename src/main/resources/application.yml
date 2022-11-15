@@ -8,12 +8,16 @@ spring:
 
     jpa:
         hibernate:
-            ddl-auto:
+            ddl-auto: none
         properties:
           hibernate:
               format_sql: true
               show_sql: true
         database: oracle
+
+    output:
+      ansi:
+          enabled: always
 
     mvc:
         pathmatch:
@@ -21,7 +25,9 @@ spring:
 
 logging:
     level:
-      org.hibernate.sql: error
+      org.hibernate.sql: debug
+      org.hibernate.type: trace
+
 
 server:
     port: 8080

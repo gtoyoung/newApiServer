@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) /* JWT를 사용하기 때문에 세션 미사용 */
                 .and()
                 .authorizeRequests()
+                .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/template").hasRole("USER")
                 .anyRequest().authenticated() /* 위의 두개를 제외한 모든 경로는 인증을 필요로 한다는 설정 */
@@ -40,6 +41,7 @@ public class SecurityConfig {
 
     /**
      * Bycrypt encoder
+     *
      * @return
      */
     @Bean

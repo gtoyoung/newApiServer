@@ -1,12 +1,12 @@
 package com.example.apiserver.repository;
 
-import com.example.apiserver.entity.User;
+import com.example.apiserver.entity.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository  extends JpaRepository<User, String> {
-    Optional<User> findByUserId(String userId);
+public interface MemberRepository extends JpaRepository<Member, String> {
+    Optional<Member> findByUserId(String userId);
 }
