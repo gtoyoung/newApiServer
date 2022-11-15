@@ -1,26 +1,32 @@
 server:
-  port: 8080
+  port: 8082
 
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
 
   datasource:
-    driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:@dovb_high?TNS_ADMIN=./src/main/resources/Wallet_DOVB
-    username: admin
-    password: "!Qkswodms0626"
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
+  h2:
+    console:
+      enabled: true
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
         show_sql: true
-    database: oracle
+
+  output:
+    ansi:
+      enabled: always
 
   mvc:
     pathmatch:
@@ -28,8 +34,8 @@ spring:
 
 logging:
   level:
-    org.hibernate.sql: error
-    org.hibernate.type: error
+    org.hibernate.sql: debug
+    org.hibernate.type.descriptor.sql: trace
 
 swagger:
   port: 8088

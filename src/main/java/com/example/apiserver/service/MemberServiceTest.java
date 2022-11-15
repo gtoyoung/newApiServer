@@ -7,13 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
+
+import javax.transaction.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-//@Transactional
-@TestPropertySource(properties = {"spring.config.location=classpath:application.yml"})
+@ActiveProfiles({"dev"})
+@Transactional // 테스트인 경우 Rollback 처리됨
 public class MemberServiceTest {
     @Autowired
     MemberService memberService;
@@ -46,3 +48,5 @@ public class MemberServiceTest {
 
     }
 }
+
+

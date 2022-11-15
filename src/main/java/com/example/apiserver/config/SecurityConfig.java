@@ -29,7 +29,10 @@ public class SecurityConfig {
                 .csrf().disable() /* REST API 서버 이르모 basic auth 및 csrf 보안 미사용 */
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) /* JWT를 사용하기 때문에 세션 미사용 */
                 .and()
+                .headers().frameOptions().disable()
+                .and()
                 .authorizeRequests()
+                .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/template").hasRole("USER")
