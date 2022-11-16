@@ -24,58 +24,42 @@ public class NewsService {
     public Page<SportNews> getNewsList(String search, int page, int size, String date) {
 
         Page<SportNews> newsList = null;
-        if(date.isBlank()){
-            if(search.isBlank()){
+        if (date.isBlank()) {
+            if (search.isBlank()) {
                 newsList = repository.findAllByOrderByRegistDateDesc(PageRequest.of(page, size));
 
-                newsList.map((news)->{
-                    List<String> wordList = new ArrayList<>();
-                    try {
-                        wordList = WordAnalysis.doWordNouns(news.getTitle());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    news.setWords(wordList);
-
-                    return news;
-                });
+                extractWord(newsList);
 
             } else {
-                newsList =  repository.findAllByTitleContainingOrderByRegistDateDesc(search, PageRequest.of(page, size));
+                newsList = repository.findAllByTitleContainingOrderByRegistDateDesc(search, PageRequest.of(page, size));
 
-                newsList.map((news)->{
-                    List<String> wordList = new ArrayList<>();
-                    try {
-                        wordList = WordAnalysis.doWordNouns(news.getTitle());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    news.setWords(wordList);
-
-                    return news;
-                });
+                extractWord(newsList);
             }
         } else {
-            DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
-            LocalDate ld = LocalDate.parse(date, DATEFORMATTER);
+            DateTimeFormatter date_formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            LocalDate ld = LocalDate.parse(date, date_formatter);
             LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-            LocalDateTime startDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(0,0,0));
-            LocalDateTime endDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(23,59,59));
-            newsList = repository.findAllByTitleContainingAndRegistDateBetweenOrderByRegistDateDesc(search, startDatetime, endDatetime, PageRequest.of(page,size));
+            LocalDateTime startDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(0, 0, 0));
+            LocalDateTime endDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(23, 59, 59));
+            newsList = repository.findAllByTitleContainingAndRegistDateBetweenOrderByRegistDateDesc(search, startDatetime, endDatetime, PageRequest.of(page, size));
 
-            newsList.map((news)->{
-                List<String> wordList = new ArrayList<>();
-                try {
-                    wordList = WordAnalysis.doWordNouns(news.getTitle());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                news.setWords(wordList);
-
-                return news;
-            });
+            extractWord(newsList);
         }
 
         return newsList;
+    }
+
+    private void extractWord(Page<SportNews> newsList) {
+        newsList.map((news) -> {
+            List<String> wordList = new ArrayList<>();
+            try {
+                wordList = WordAnalysis.doWordNouns(news.getTitle());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            news.setWords(wordList);
+
+            return news;
+        });
     }
 }

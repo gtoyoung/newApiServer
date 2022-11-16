@@ -26,6 +26,9 @@ public class JwtTokenProvider {
 
     private final Key key;
 
+    private final long ACCESS_TOKEN_VALID_TIME = 1 * 60 * 1000L;   // 1분
+    private final long REFRESH_TOKEN_VALID_TIME = 60 * 60 * 24 * 7 * 1000L;   // 1주
+
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -45,22 +48,51 @@ public class JwtTokenProvider {
 
         long now = (new Date()).getTime();
 
-        //Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + 86400000);
+        // Acess Token 생성
+        String accessToken = createJwtAccessToken(key, authorities, now, authentication);
+
+        // Refresh Token 생성
+        String refreshToken = createJwtRefreshToken(key, authorities, now);
+
+        return TokenInfo.builder().grantType("Bearer").accessToken(accessToken).refreshToken(refreshToken).build();
+    }
+
+    /**
+     * Access Token 생성
+     *
+     * @param key
+     * @param authorities
+     * @param now
+     * @param authentication
+     * @return
+     */
+    public String createJwtAccessToken(Key key, String authorities, long now, Authentication authentication) {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
-                .setExpiration(accessTokenExpiresIn)
+                .setExpiration(new Date(now + ACCESS_TOKEN_VALID_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
+        return accessToken;
+    }
+
+    /**
+     * Refresh Token 생성
+     *
+     * @param key
+     * @param authorities
+     * @param now
+     * @return
+     */
+    public String createJwtRefreshToken(Key key, String authorities, long now) {
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + 86400000))
+                .setExpiration(new Date(now + REFRESH_TOKEN_VALID_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return TokenInfo.builder().grantType("Bearer").accessToken(accessToken).refreshToken(refreshToken).build();
+        return refreshToken;
     }
 
     /**

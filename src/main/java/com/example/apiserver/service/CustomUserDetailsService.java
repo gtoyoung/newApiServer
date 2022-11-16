@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // 사용자 Role값 이어붙이기
         String roles = user.getRoles().stream().map((d) -> {
             return d.getMemberRole().getName();
-        }).reduce((t, u) -> t + "," + u).get();
+        }).collect(Collectors.joining(","));
         return User.builder()
                 .username(user.getUserId())
                 .password(user.getPassword())
