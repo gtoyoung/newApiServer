@@ -43,8 +43,11 @@ public class MemberService {
         return tokenInfo;
     }
 
+    public Optional<String> refreshToken(TokenInfo tokenInfo) {
+        return jwtTokenProvider.validateRefreshToken(tokenInfo);
+    }
 
-    public Member  saveMember(Member member) {
+    public Member saveMember(Member member) {
         validateDuplicateMember(member);
         Member response = userRepository.save(member);
         addRoleToUser(response, "USER");
@@ -52,8 +55,10 @@ public class MemberService {
         return response;
     }
 
-    public Member getMember(String userId){
-        return userRepository.findByUserId(userId).orElseGet(()->{return null;});
+    public Member getMember(String userId) {
+        return userRepository.findByUserId(userId).orElseGet(() -> {
+            return null;
+        });
 //        return userRepository.getMemberByUserId(userId);
     }
 
@@ -72,7 +77,7 @@ public class MemberService {
     private void validateDuplicateMember(Member member) {
         Optional<Member> findMember = userRepository.findByUserId(member.getUserId());
 
-        if(!findMember.isEmpty()) {
+        if (!findMember.isEmpty()) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
     }

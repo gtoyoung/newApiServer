@@ -1,6 +1,5 @@
 package com.example.apiserver.config;
 
-import com.example.apiserver.interceptor.JwtTokenInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -18,7 +17,7 @@ import java.util.List;
 @EnableSpringDataWebSupport
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final JwtTokenInterceptor jwtTokenInterceptor;
+//    private final JwtTokenInterceptor jwtTokenInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
@@ -39,6 +38,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 추후 예외 경로 추가
-        registry.addInterceptor(jwtTokenInterceptor).addPathPatterns("/**").excludePathPatterns("/signUp");
+//        registry.addInterceptor(jwtTokenInterceptor).addPathPatterns("/**").excludePathPatterns("/signUp");
     }
 }

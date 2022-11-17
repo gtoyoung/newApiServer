@@ -18,6 +18,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class JwtTokenProvider {
     private final Key key;
 
     private final long ACCESS_TOKEN_VALID_TIME = 1 * 60 * 1000L;   // 1분
-    private final long REFRESH_TOKEN_VALID_TIME = 60 * 60 * 24 * 7 * 1000L;   // 1주
+    private final long REFRESH_TOKEN_VALID_TIME = 60 * 60 * 24 * 1 * 1000L;   // 1일
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -46,13 +47,16 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        Claims claims = Jwts.claims().setSubject(authentication.getName());//JWT payload에 저장되는 정보단위
+        claims.put("auth", authorities);// Key/Value 쌍으로 저장된다.
+
         long now = (new Date()).getTime();
 
         // Acess Token 생성
-        String accessToken = createJwtAccessToken(key, authorities, now, authentication);
+        String accessToken = createJwtAccessToken(key, now, claims);
 
         // Refresh Token 생성
-        String refreshToken = createJwtRefreshToken(key, authorities, now);
+        String refreshToken = createJwtRefreshToken(key, now, claims);
 
         return TokenInfo.builder().grantType("Bearer").accessToken(accessToken).refreshToken(refreshToken).build();
     }
@@ -61,16 +65,36 @@ public class JwtTokenProvider {
      * Access Token 생성
      *
      * @param key
-     * @param authorities
      * @param now
-     * @param authentication
+     * @param claims
      * @return
      */
-    public String createJwtAccessToken(Key key, String authorities, long now, Authentication authentication) {
+    public String createJwtAccessToken(Key key, long now, Claims claims) {
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", authorities)
+                .setClaims(claims)
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(now + ACCESS_TOKEN_VALID_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return accessToken;
+    }
+
+    /**
+     * Access Token 재발급
+     *
+     * @param userName
+     * @param roles
+     * @return
+     */
+    public String recreateAccessToken(String userName, Object roles) {
+        Claims claims = Jwts.claims().setSubject(userName);//JWT payload에 저장되는 정보단위
+        claims.put("auth", roles);// Key/Value 쌍으로 저장된다.
+        Date now = new Date();
+
+        String accessToken = Jwts.builder().setClaims(claims)//정보저장
+                .setIssuedAt(now)//토큰 발생시간 정보
+                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -81,13 +105,15 @@ public class JwtTokenProvider {
      * Refresh Token 생성
      *
      * @param key
-     * @param authorities
      * @param now
+     * @param claims
      * @return
      */
-    public String createJwtRefreshToken(Key key, String authorities, long now) {
+    public String createJwtRefreshToken(Key key, long now, Claims claims) {
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(now + REFRESH_TOKEN_VALID_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -120,7 +146,12 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    // 토큰 정보를 검증하는 메서드
+    /**
+     * Access토큰 정보를 검증하는 메서드
+     *
+     * @param token
+     * @return
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -135,6 +166,29 @@ public class JwtTokenProvider {
             log.info("JWT claims string is empty.", e);
         }
         return false;
+    }
+
+    /**
+     * Refresh 토큰 검증 및 Access 토큰 재발급 메서드
+     *
+     * @param tokenInfo
+     * @return
+     */
+    public Optional<String> validateRefreshToken(TokenInfo tokenInfo) {
+        try {
+            //검증
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(tokenInfo.getRefreshToken());
+
+            //refresh 토큰의 만료시간이 지나지 않았을 경우, 새로운 Access 토큰을 생성
+            if (!claims.getBody().getExpiration().before(new Date())) {
+                return Optional.ofNullable(recreateAccessToken(claims.getBody().get("sub").toString(), claims.getBody().get("auth")));
+            }
+        } catch (Exception e) {
+            //refresh 토큰이 만료되었을 경우 ,로그인이 필요
+            return null;
+        }
+
+        return null;
     }
 
     private Claims parseClaims(String accessToken) {
