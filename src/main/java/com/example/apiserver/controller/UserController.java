@@ -7,6 +7,8 @@ import com.example.apiserver.entity.member.Member;
 import com.example.apiserver.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,35 +23,32 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public TokenInfo login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
+    public ResponseEntity<TokenInfo> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
         String userId = userLoginRequestDto.getUserId();
         String password = userLoginRequestDto.getPassword();
         TokenInfo tokenInfo = userService.login(userId, password);
-        return tokenInfo;
+        return new ResponseEntity(tokenInfo, HttpStatus.OK);
     }
 
     @PostMapping("/sign")
-    public String sign(@RequestBody MemberFormDto memberFormDto) {
+    public ResponseEntity sign(@RequestBody MemberFormDto memberFormDto) {
         Member signMember = Member.createMember(memberFormDto, passwordEncoder);
 
         Member result = userService.saveMember(signMember);
 
         if (result != null) {
-            return "success";
+            return new ResponseEntity("success", HttpStatus.OK);
         }
 
-        return "fail";
+        return new ResponseEntity("fail", HttpStatus.OK);
     }
 
     @PostMapping("/refreshToken")
-    public String refreshToken(@RequestBody TokenInfo tokenInfo) {
-        return userService.refreshToken(tokenInfo).orElseGet(() -> {
+    public ResponseEntity refreshToken(@RequestBody TokenInfo tokenInfo) {
+        String result = userService.refreshToken(tokenInfo).orElseGet(() -> {
             return "invalid";
         });
-    }
 
-    @PostMapping("/test")
-    public String test() {
-        return "success";
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 }
