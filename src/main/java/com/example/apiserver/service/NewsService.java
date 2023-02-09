@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,7 +50,7 @@ public class NewsService {
 
     private void extractWord(Page<SportNews> newsList) {
         newsList.map((news) -> {
-            List<String> wordList = new ArrayList<>();
+            List<String> wordList;
             try {
                 wordList = WordAnalysis.doWordNouns(news.getTitle());
             } catch (Exception e) {

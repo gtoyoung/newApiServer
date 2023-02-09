@@ -50,3 +50,8 @@ swagger:
 
 jwt:
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+
+fcm:
+  key:
+    path: ./google_project.json
+    scope: https://www.googleapis.com/auth/cloud-platform

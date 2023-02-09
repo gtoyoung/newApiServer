@@ -5,6 +5,7 @@
 # Compiled class file
 *.class
 src/main/resources/Wallet_DOVB
+src/main/resources/google_project.json
 # Log file
 *.log
 
