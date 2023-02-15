@@ -34,7 +34,9 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/newsList").permitAll()
-                .antMatchers("/swagger-ui.html/**").permitAll()
+                .antMatchers("/v2/api-docs", "/configuration/ui",
+                        "/swagger-resources", "/configuration/security",
+                        "/swagger-ui.html", "/webjars/**", "/swagger/**").permitAll()
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/**").permitAll()
                 .antMatchers("/login").permitAll()
