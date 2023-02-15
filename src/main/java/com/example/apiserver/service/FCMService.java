@@ -21,10 +21,10 @@ public class FCMService {
 
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/messagetest-e5c56/messages:send";
     private final ObjectMapper objectMapper;
-    @Value("${fcm.key.path}")
+    @Value("${spring.fcm.key.path}")
     private String googleApplicationCredentials;
     // 메시징만 권한 설정
-    @Value("${fcm.key.scope}")
+    @Value("${spring.fcm.key.scope}")
     private String fireBaseScope;
     // oauth2 인증대상
     private GoogleCredentials googleCredentials;

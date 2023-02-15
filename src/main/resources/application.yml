@@ -2,9 +2,9 @@ server:
   port: 8080
 
 spring:
-  config:
-    activate:
-      on-profile: prod
+  #  config:
+  #    activate:
+  #      on-profile: prod
 
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
@@ -26,6 +26,14 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  jwt:
+    secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+
+  fcm:
+    key:
+      path: ./google_project.json
+      scope: https://www.googleapis.com/auth/cloud-platform
+
 logging:
   level:
     org.hibernate.sql: error
@@ -39,11 +47,3 @@ swagger:
     /swagger-resources,
     /swagger-resources/**/*,
     /v2/api-docs
-
-jwt:
-  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
-
-fcm:
-  key:
-    path: ./google_project.json
-    scope: https://www.googleapis.com/auth/cloud-platform

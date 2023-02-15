@@ -1,7 +1,7 @@
 package com.example.apiserver.service;
 
-import com.example.apiserver.entity.SportNews;
-import com.example.apiserver.repository.SportsNewsRepository;
+import com.example.apiserver.entity.SoccerNews;
+import com.example.apiserver.repository.SoccerNewsRepository;
 import com.example.apiserver.utils.WordAnalysis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,19 +18,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NewsService {
 
-    private final SportsNewsRepository repository;
+    private final SoccerNewsRepository repository;
 
-    public Page<SportNews> getNewsList(String search, int page, int size, String date) {
+    public Page<SoccerNews> getNewsList(String search, int page, int size, String date) {
 
-        Page<SportNews> newsList = null;
+        Page<SoccerNews> newsList = null;
         if (date.isBlank()) {
             if (search.isBlank()) {
-                newsList = repository.findAllByOrderByRegistDateDesc(PageRequest.of(page, size));
+                newsList = repository.findAllByOrderByDatetimeDesc(PageRequest.of(page, size));
 
                 extractWord(newsList);
 
             } else {
-                newsList = repository.findAllByTitleContainingOrderByRegistDateDesc(search, PageRequest.of(page, size));
+                newsList = repository.findAllByTitleContainingOrSubContentContainingOrderByDatetimeDesc(search, search, PageRequest.of(page, size));
 
                 extractWord(newsList);
             }
@@ -40,7 +40,7 @@ public class NewsService {
             LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
             LocalDateTime startDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(0, 0, 0));
             LocalDateTime endDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(23, 59, 59));
-            newsList = repository.findAllByTitleContainingAndRegistDateBetweenOrderByRegistDateDesc(search, startDatetime, endDatetime, PageRequest.of(page, size));
+            newsList = repository.findAllByTitleContainingOrSubContentContainingAndDatetimeBetweenOrderByDatetimeDesc(search, search, startDatetime, endDatetime, PageRequest.of(page, size));
 
             extractWord(newsList);
         }
@@ -48,11 +48,11 @@ public class NewsService {
         return newsList;
     }
 
-    private void extractWord(Page<SportNews> newsList) {
+    private void extractWord(Page<SoccerNews> newsList) {
         newsList.map((news) -> {
             List<String> wordList;
             try {
-                wordList = WordAnalysis.doWordNouns(news.getTitle());
+                wordList = WordAnalysis.doWordNouns(news.getSubContent());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

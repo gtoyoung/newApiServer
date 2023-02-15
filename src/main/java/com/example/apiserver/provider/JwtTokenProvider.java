@@ -30,7 +30,7 @@ public class JwtTokenProvider {
     private final long ACCESS_TOKEN_VALID_TIME = 1 * 60 * 1000L;   // 1분
     private final long REFRESH_TOKEN_VALID_TIME = 60 * 60 * 24 * 1 * 1000L;   // 1일
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public JwtTokenProvider(@Value("${spring.jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
