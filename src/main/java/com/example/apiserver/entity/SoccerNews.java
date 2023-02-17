@@ -45,8 +45,11 @@ public class SoccerNews {
     @Transient
     private List<String> words;
 
+    @Transient
+    private String link;
+
     @Builder
-    public SoccerNews(Long id, String oid, String aid, String officeName, String title, String subContent, String thumbnail, LocalDateTime datetime, String sectionName, List<String> words) {
+    public SoccerNews(Long id, String oid, String aid, String officeName, String title, String subContent, String thumbnail, LocalDateTime datetime, String sectionName, List<String> words, String link) {
         this.id = id;
         this.oid = oid;
         this.aid = aid;
@@ -57,6 +60,7 @@ public class SoccerNews {
         this.datetime = datetime;
         this.sectionName = sectionName;
         this.words = words;
+        this.link = link;
     }
 
 

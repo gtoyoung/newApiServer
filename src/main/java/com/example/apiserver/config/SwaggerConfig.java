@@ -20,7 +20,7 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.example.apiserver"))
                 .paths(PathSelectors.any())
-                .build();
+                .build().pathMapping("/");
     }
 
     private ApiInfo apiInfo() {

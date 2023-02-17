@@ -26,13 +26,8 @@ public class NewsService {
         if (date.isBlank()) {
             if (search.isBlank()) {
                 newsList = repository.findAllByOrderByDatetimeDesc(PageRequest.of(page, size));
-
-                extractWord(newsList);
-
             } else {
                 newsList = repository.findAllByTitleContainingOrSubContentContainingOrderByDatetimeDesc(search, search, PageRequest.of(page, size));
-
-                extractWord(newsList);
             }
         } else {
             DateTimeFormatter date_formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -41,9 +36,10 @@ public class NewsService {
             LocalDateTime startDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(0, 0, 0));
             LocalDateTime endDatetime = LocalDateTime.of(ldt.toLocalDate(), LocalTime.of(23, 59, 59));
             newsList = repository.findAllByTitleContainingOrSubContentContainingAndDatetimeBetweenOrderByDatetimeDesc(search, search, startDatetime, endDatetime, PageRequest.of(page, size));
-
-            extractWord(newsList);
         }
+
+        extractWord(newsList);
+        addLink(newsList);
 
         return newsList;
     }
@@ -57,6 +53,15 @@ public class NewsService {
                 throw new RuntimeException(e);
             }
             news.setWords(wordList);
+
+            return news;
+        });
+    }
+
+    private void addLink(Page<SoccerNews> newsList) {
+        newsList.map((news) -> {
+            String link = "https://sports.news.naver.com/news" + "?oid=" + news.getOid() + "&aid=" + news.getAid();
+            news.setLink(link);
 
             return news;
         });
