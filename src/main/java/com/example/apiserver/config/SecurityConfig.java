@@ -32,20 +32,21 @@ public class SecurityConfig {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/newsList").permitAll()
-                .antMatchers("/v2/api-docs", "/configuration/ui",
-                        "/swagger-resources", "/configuration/security",
-                        "/swagger-ui.html", "/webjars/**", "/swagger/**").permitAll()
+//                .antMatchers("/h2-console/**").permitAll()
+//                .antMatchers("/newsList").permitAll()
+//                .antMatchers("/swagger-resources/**").permitAll()
+//                .antMatchers("/v3/api-docs", "/configuration/ui", "/swagger-ui/**",
+//                        "/swagger-resources", "/configuration/security",
+//                        "/swagger-ui.html", "/webjars/**", "/swagger/**").permitAll()
                 .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/sign").permitAll()
-                .antMatchers("/refreshToken").permitAll()
-                .antMatchers("/logout").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated() /* 위의 두개를 제외한 모든 경로는 인증을 필요로 한다는 설정 */
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); /* JWT 인증을 위하여 직접 구현한 필터를 UserDetail 필터 전에 실행 */
+                .antMatchers("/**").permitAll();
+//                .antMatchers("/login").permitAll()
+//                .antMatchers("/sign").permitAll()
+//                .antMatchers("/refreshToken").permitAll()
+//                .antMatchers("/logout").hasAnyRole("USER", "ADMIN")
+//                .anyRequest().authenticated() /* 위의 두개를 제외한 모든 경로는 인증을 필요로 한다는 설정 */
+//                .and()
+//                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); /* JWT 인증을 위하여 직접 구현한 필터를 UserDetail 필터 전에 실행 */
         return http.build();
     }
 

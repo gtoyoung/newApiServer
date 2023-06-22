@@ -38,12 +38,3 @@ logging:
   level:
     org.hibernate.sql: error
     org.hibernate.type: error
-
-swagger:
-  port: 8088
-  paths: |
-    /swagger-ui/index.html,
-    /webjars/springfox-swagger-ui/**/*,
-    /swagger-resources,
-    /swagger-resources/**/*,
-    /v3/api-docs

@@ -10,8 +10,6 @@ import org.springframework.web.servlet.config.annotation.*;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
-@EnableSpringDataWebSupport
 public class WebMvcConfig implements WebMvcConfigurer {
 
 //    private final JwtTokenInterceptor jwtTokenInterceptor;
@@ -25,18 +23,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*");
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/swagger-ui/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/")
-                .resourceChain(false);
-    }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/swagger-ui/").setViewName("forward:/swagger-ui/index.html");
     }
 
     @Override
