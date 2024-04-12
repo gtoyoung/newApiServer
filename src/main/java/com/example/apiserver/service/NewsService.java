@@ -1,18 +1,25 @@
 package com.example.apiserver.service;
 
+import com.example.apiserver.dto.NaverSoccerDto;
 import com.example.apiserver.entity.SoccerNews;
 import com.example.apiserver.repository.SoccerNewsRepository;
 import com.example.apiserver.utils.WordAnalysis;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.parser.ParseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +27,12 @@ public class NewsService {
 
     private final SoccerNewsRepository repository;
 
+    private final NaverSoccerNews naverSoccerNews;
+
     public Page<SoccerNews> getNewsList(String search, int page, int size, String date) {
 
         Page<SoccerNews> newsList = null;
+
         if (date.isBlank()) {
             if (search.isBlank()) {
                 newsList = repository.findAllByOrderByDatetimeDesc(PageRequest.of(page, size));
@@ -65,5 +75,53 @@ public class NewsService {
 
             return news;
         });
+    }
+
+    @Transactional
+    public void deleteNews() {
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(0, 0, 0));
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(23, 59, 59));
+
+        repository.deleteDateTime(startDatetime, endDatetime);
+    }
+
+
+    public void saveNews() throws ParseException {
+        // 오늘 날짜를 가져온다.
+        Date nowDate = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        // 변환 날짜
+        String strNowDate = simpleDateFormat.format(nowDate);
+
+        // 전체 페이지 수
+        int totalPage = Integer.parseInt(naverSoccerNews.getTotalPages(strNowDate));
+
+        // 삽입할 데이터 껍데기
+        List<SoccerNews> saveList = new ArrayList<>();
+
+        // 전체 페이지 수 만큼 진행
+        for (int i = 1; i <= totalPage; i++) {
+            // 페이지당 기사 가져오기
+            List<NaverSoccerDto> result = naverSoccerNews.getSoccerNews(strNowDate, i);
+
+            // SoccerNews Entity로 변환
+            List<SoccerNews> convertList = result.stream().map(SoccerNews::createSoccerNews).collect(Collectors.toList());
+
+            List<SoccerNews> dinstintList = new ArrayList<>();
+
+            convertList.forEach(soccerNews -> {
+                String oid = soccerNews.getOid();
+
+                // 시스템 변화로 인해 2개씩 크롤링되는듯?
+                if (!dinstintList.stream().anyMatch(vo -> vo.getOid().equals(oid))) {
+                    dinstintList.add(soccerNews);
+                }
+            });
+
+            saveList.addAll(dinstintList);
+        }
+
+        repository.saveAll(saveList);
     }
 }
