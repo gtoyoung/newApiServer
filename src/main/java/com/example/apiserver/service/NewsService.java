@@ -86,42 +86,31 @@ public class NewsService {
     }
 
 
-    public void saveNews() throws ParseException {
-        // 오늘 날짜를 가져온다.
-        Date nowDate = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+    public void saveNews() {
 
-        // 변환 날짜
-        String strNowDate = simpleDateFormat.format(nowDate);
+        try {
+            // 오늘 날짜를 가져온다.
+            Date nowDate = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
-        // 전체 페이지 수
-        int totalPage = Integer.parseInt(naverSoccerNews.getTotalPages(strNowDate));
+            // 변환 날짜
+            String strNowDate = simpleDateFormat.format(nowDate);
 
-        // 삽입할 데이터 껍데기
-        List<SoccerNews> saveList = new ArrayList<>();
+            // 전체 페이지 수
+            int totalPage = Integer.parseInt(naverSoccerNews.getTotalPages(strNowDate));
 
-        // 전체 페이지 수 만큼 진행
-        for (int i = 1; i <= totalPage; i++) {
-            // 페이지당 기사 가져오기
-            List<NaverSoccerDto> result = naverSoccerNews.getSoccerNews(strNowDate, i);
+            // 전체 페이지 수 만큼 진행
+            for (int i = 1; i <= totalPage; i++) {
+                // 페이지당 기사 가져오기
+                List<NaverSoccerDto> result = naverSoccerNews.getSoccerNews(strNowDate, i);
 
-            // SoccerNews Entity로 변환
-            List<SoccerNews> convertList = result.stream().map(SoccerNews::createSoccerNews).collect(Collectors.toList());
+                // SoccerNews Entity로 변환
+                List<SoccerNews> convertList = result.stream().map(SoccerNews::createSoccerNews).collect(Collectors.toList());
 
-            List<SoccerNews> dinstintList = new ArrayList<>();
-
-            convertList.forEach(soccerNews -> {
-                String oid = soccerNews.getOid();
-
-                // 시스템 변화로 인해 2개씩 크롤링되는듯?
-                if (!dinstintList.stream().anyMatch(vo -> vo.getOid().equals(oid))) {
-                    dinstintList.add(soccerNews);
-                }
-            });
-
-            saveList.addAll(dinstintList);
+                repository.saveAll(convertList);
+            }
+        } catch (Exception ex){
+            ex.getStackTrace();
         }
-
-        repository.saveAll(saveList);
     }
 }

@@ -10,7 +10,7 @@ spring:
     driver-class-name: oracle.jdbc.OracleDriver
     url: jdbc:oracle:thin:@dovb_high?TNS_ADMIN=./src/main/resources/Wallet_DOVB
     username: admin
-    password: "!Qkswodms0626"
+    password: "!Qkswodms7043"
 
 
   jpa:
@@ -20,6 +20,7 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+        highlight_sql: true
     database: oracle
 
   mvc:
@@ -36,5 +37,11 @@ spring:
 
 logging:
   level:
-    org.hibernate.sql: error
-    org.hibernate.type: error
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
+#          descriptor:
+#    org.hibernate.sql: error
+#    org.hibernate.type: error
+#    org.hibernate.type.descriptor.sql: trace
