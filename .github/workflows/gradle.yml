@@ -28,7 +28,7 @@ jobs:
       run: ./gradlew build
 
     - name: Copy build directory to server
-      uses: gtoyoung/newApiServer@master
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.APP_SERVER_HOST }}
         username: ${{ secrets.APP_SERVER_USER }}
