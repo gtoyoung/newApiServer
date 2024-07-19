@@ -19,6 +19,18 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup application.yml with secrets
+      run: |
+        cd ./src/main/resources
+        echo "spring:" > application.yml
+        echo "  datasource:" >> application.yml
+        echo "    username: ${DB_USER}" >> application.yml
+        echo "    password: ${DB_PASSWORD}" >> application.yml
+      env:
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
@@ -26,20 +38,26 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: ./gradlew bootJar
 
-    - name: Test secret 
-      run: ${{secrets.APP_SERVER_HOST}}
-
-    - name: Copy build directory to server
+    - name: Transfer Jar use SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{secrets.APP_SERVER_HOST}}
+        username: ${{secrets.APP_SERVER_USER}}
+        password: ${{secrets.APP_SERVER_PASSWORD}}
+        port: ${{secrets.APP_SERVER_PORT}}
+        source: "./build/libs/*.jar"
+        target: "/home/ubuntu/"
+        
+    - name: Execute apiServer start
       uses: appleboy/ssh-action@master
       with:
         host: ${{secrets.APP_SERVER_HOST}}
         username: ${{secrets.APP_SERVER_USER}}
         password: ${{secrets.APP_SERVER_PASSWORD}}
         port: ${{secrets.APP_SERVER_PORT}}
-        source: "./build/libs/*"
-        target: "/home/ubuntu/"
+        script_stop: true
         script: |
           sh /home/ubuntu/api_deploy.sh
 

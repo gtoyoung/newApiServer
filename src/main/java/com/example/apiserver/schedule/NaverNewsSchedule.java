@@ -28,7 +28,7 @@ public class NaverNewsSchedule {
     private final NewsService newsService;
 
     //    @Async
-    @Scheduled(cron = "0 0 0,3,6,9,12,15,18,21 * * ?")
+//    @Scheduled(cron = "0 0 0,3,6,9,12,15,18,21 * * ?")
     public void scheduleTask() throws ParseException {
         // Transaction 동시성 문제로 인한 삭제와 삽입 분기 처리
         newsService.deleteNews();

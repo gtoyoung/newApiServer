@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 //        DataSourceTransactionManagerAutoConfiguration.class,
 //        HibernateJpaAutoConfiguration.class
 //})
-@EnableScheduling
+//@EnableScheduling
 @SpringBootApplication(scanBasePackages = {"com.example.apiserver"})
 public class ApiServerApplication {
 
