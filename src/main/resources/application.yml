@@ -2,15 +2,11 @@ server:
   port: 8080
 
 spring:
-  #  config:
-  #    activate:
-  #      on-profile: prod
-
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     url: jdbc:oracle:thin:@dovb_high?TNS_ADMIN=./src/main/resources/Wallet_DOVB
-    username: admin
-    password: "!Qkswodms7043"
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 
 
   jpa:
