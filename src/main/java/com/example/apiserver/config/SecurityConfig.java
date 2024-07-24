@@ -1,5 +1,6 @@
 package com.example.apiserver.config;
 
+import com.example.apiserver.filter.AuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,22 +25,13 @@ public class SecurityConfig {
                 .and()
                 .headers().frameOptions().disable()
                 .and()
-                .authorizeRequests()
-//                .antMatchers("/h2-console/**").permitAll()
-//                .antMatchers("/newsList").permitAll()
-//                .antMatchers("/swagger-resources/**").permitAll()
-//                .antMatchers("/v3/api-docs", "/configuration/ui", "/swagger-ui/**",
-//                        "/swagger-resources", "/configuration/security",
-//                        "/swagger-ui.html", "/webjars/**", "/swagger/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/**").permitAll();
-//                .antMatchers("/login").permitAll()
-//                .antMatchers("/sign").permitAll()
-//                .antMatchers("/refreshToken").permitAll()
-//                .antMatchers("/logout").hasAnyRole("USER", "ADMIN")
-//                .anyRequest().authenticated() /* 위의 두개를 제외한 모든 경로는 인증을 필요로 한다는 설정 */
-//                .and()
-//                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); /* JWT 인증을 위하여 직접 구현한 필터를 UserDetail 필터 전에 실행 */
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .antMatchers("/newsList").authenticated()           // 인증 필요
+                                .antMatchers("/webjars/**").permitAll()         // 인증 불필요
+                                .anyRequest().permitAll()                        // 모든 URL 허용
+                )
+                .addFilterBefore(new AuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); /* JWT 인증을 위하여 직접 구현한 필터를 UserDetail 필터 전에 실행 */
         return http.build();
     }
 
