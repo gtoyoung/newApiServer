@@ -6,10 +6,12 @@ import com.example.apiserver.repository.SoccerNewsRepository;
 import com.example.apiserver.utils.WordAnalysis;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.annotations.Cacheable;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ public class NewsService {
 
     private final NaverSoccerNews naverSoccerNews;
 
+    @Cacheable(value = "news")
     public Page<SoccerNews> getNewsList(String search, int page, int size, String date) {
 
         Page<SoccerNews> newsList = null;
@@ -85,7 +88,7 @@ public class NewsService {
         repository.deleteDateTime(startDatetime, endDatetime);
     }
 
-
+    @CacheEvict(value = "news")
     public void saveNews() {
 
         try {
