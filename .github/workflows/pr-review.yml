@@ -3,6 +3,7 @@ name: PR Summary and Explanation
 on:
   pull_request:
     types: [opened, synchronize]
+  workflow_dispatch:
 
 jobs:
   pr-summary:
