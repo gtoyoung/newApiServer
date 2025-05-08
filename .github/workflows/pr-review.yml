@@ -38,7 +38,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python3 ./.github/scripts/generate_summary.py
+          python3 .github/script/generate_summary.py
 
       - name: Format PR Review Summary for Comment
         id: store
