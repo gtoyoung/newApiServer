@@ -1,19 +1,19 @@
 import os
-import smtplib
+# import smtplib
 import google.generativeai as genai
-from email.message import EmailMessage
-
-def send_email(subject, body):
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = os.getenv['EMAIL_USER']
-    msg['To'] = os.getenv['EMAIL_TO']
-    msg.set_content(body)
-
-    with smtplib.SMTP(os.getenv['EMAIL_HOST'], int(os.getenv['EMAIL_PORT'])) as smtp:
-        smtp.starttls()
-        smtp.login(os.getenv['EMAIL_USER'], os.getenv['EMAIL_PASS'])
-        smtp.send_message(msg)
+# from email.message import EmailMessage
+#
+# def send_email(subject, body):
+#     msg = EmailMessage()
+#     msg['Subject'] = subject
+#     msg['From'] = os.getenv('EMAIL_USER')
+#     msg['To'] = os.getenv('EMAIL_TO')
+#     msg.set_content(body)
+#
+#     with smtplib.SMTP(os.getenv('EMAIL_HOST'), int(os.getenv('EMAIL_PORT')) as smtp:
+#         smtp.starttls()
+#         smtp.login(os.getenv('EMAIL_USER'), os.getenv('EMAIL_PASS'))
+#         smtp.send_message(msg)
 
 def main():
     # Gemini API 키 읽기
@@ -94,7 +94,7 @@ def main():
         f.write(response.text)
 
     # 결과 내용 이메일 전송
-    send_email('PR 요약', response.text)
+#     send_email('PR 요약', response.text)
 
 if __name__ == "__main__":
     main()
