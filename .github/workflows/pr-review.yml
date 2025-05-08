@@ -2,9 +2,9 @@ name: PR Summary and Explanation
 
 on:
   pull_request:
-    types:[opened, synchronize]
+    types: [opened, synchronize]
 
-job:
+jobs:
   pr-summary:
     runs-on: ubuntu-latest
 
