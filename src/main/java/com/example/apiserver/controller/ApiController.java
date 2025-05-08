@@ -22,7 +22,7 @@ public class ApiController {
     private final CacheManager cacheManager;
 
     @GetMapping(value = "/newsList")
-    @ApiOperation(value = "해축 Article", response = SoccerNews.class)
+    @ApiOperation(value = "해외 축구 기사", response = SoccerNews.class)
     public Page<SoccerNews> getNews(@RequestParam(required = false, defaultValue = "") String search, @RequestParam(required = false, defaultValue = "") int page, @RequestParam(required = false, defaultValue = "") int size, @RequestParam(required = false, defaultValue = "") String date) {
         return service.getNewsList(search, page, size, date);
     }
